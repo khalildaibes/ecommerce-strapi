@@ -1,0 +1,45 @@
+{
+  "collectionName": "banners",
+  "info": {
+    "name": "banner",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false,
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "image": {
+      "type": "media"
+    },
+    "buttontext": {
+      "type": "string"
+    },
+    "product": {
+      "type": "string"
+    },
+    "desc": {
+      "type": "text"
+    },
+    "smalltext": {
+      "type": "string"
+    },
+    "midtext": {
+      "type": "string"
+    },
+    "largetext1": {
+      "type": "string"
+    },
+    "largetext2": {
+      "type": "string"
+    },
+    "discount": {
+      "type": "string"
+    },
+    "saletime": {
+      "type": "string"
+    }
+  }
+}
