@@ -4,4 +4,7 @@ export default ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
+  node: {
+    options: '--max-old-space-size=4096',
+  },
 });
