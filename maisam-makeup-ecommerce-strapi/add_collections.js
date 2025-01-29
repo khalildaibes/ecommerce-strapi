@@ -267,6 +267,12 @@ createContentType('brand', brandAttributes);
 
 // Define the attributes for the `product` content type to match the CSV order and table structure
 const productAttributes = {
+  image: {
+    type: 'media',
+    multiple: true,
+    required: true,
+    allowedTypes: ['images'],
+  },
   categories: {
     type: 'string', // JSON type for array of strings
   },
