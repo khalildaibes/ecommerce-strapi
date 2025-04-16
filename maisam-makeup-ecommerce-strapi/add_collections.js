@@ -11,7 +11,7 @@ const createContentType = (contentTypeName, attributes) => {
     path.join(apiPath, 'services'),
     path.join(apiPath, 'routes'),
     path.join(apiPath, 'config'),
-    path.join(apiPath, 'models'), // for settings.json
+    path.join(apiPath, 'models'),
     path.join(apiPath, 'content-types', `${contentTypeName}`),
   ];
 
@@ -79,202 +79,142 @@ export default factories.createCoreRouter('api::${contentTypeName}.${contentType
     JSON.stringify(schemaContent, null, 2)
   );
 
-  // Create the model settings definition
-  const modelContent = {
-    collectionName: `${contentTypeName}`,
-    info: {
-      name: `${contentTypeName}`,
-      description: ""
-    },
-    options: {
-      draftAndPublish: false,
-      increments: true,
-      timestamps: true,
-      comment: ""
-    },
-    attributes: attributes,
-  };
-  fs.writeFileSync(
-    path.join(apiPath, 'models', `${contentTypeName}.settings.json`),
-    JSON.stringify(modelContent, null, 2)
-  );
-
-  // Create the routes configuration
-  const routesConfig = {
-    routes: [
-      {
-        method: "GET",
-        path: `/${contentTypeName.toLowerCase()}s`,
-        handler: `${contentTypeName}.find`,
-        config: { policies: [] }
-      },
-      {
-        method: "GET",
-        path: `/${contentTypeName.toLowerCase()}s/count`,
-        handler: `${contentTypeName}.count`,
-        config: { policies: [] }
-      },
-      {
-        method: "GET",
-        path: `/${contentTypeName.toLowerCase()}s/:id`,
-        handler: `${contentTypeName}.findOne`,
-        config: { policies: [] }
-      },
-      {
-        method: "POST",
-        path: `/${contentTypeName.toLowerCase()}s`,
-        handler: `${contentTypeName}.create`,
-        config: { policies: [] }
-      },
-      {
-        method: "PUT",
-        path: `/${contentTypeName.toLowerCase()}s/:id`,
-        handler: `${contentTypeName}.update`,
-        config: { policies: [] }
-      },
-      {
-        method: "DELETE",
-        path: `/${contentTypeName.toLowerCase()}s/:id`,
-        handler: `${contentTypeName}.delete`,
-        config: { policies: [] }
-      }
-    ]
-  };
-
-  fs.writeFileSync(
-    path.join(apiPath, 'config', `routes.json`),
-    JSON.stringify(routesConfig, null, 2)
-  );
-
   console.log(`Content Type '${contentTypeName}' created successfully!`);
 };
 
-// Define the attributes for the `banner` content type
-const bannerAttributes = {
-  image: {
-    type: 'media',
-    multiple: false,
-    required: true,
-    allowedTypes: ['images'],
-  },
-  buttonText: {
+// Define attributes for Article
+const articleAttributes = {
+  title: {
     type: 'string',
   },
-  product: {
-    type: 'string',
-  },
-  desc: {
-    type: 'string',
-  },
-  smallText: {
-    type: 'string',
-  },
-  midText: {
-    type: 'string',
-  },
-  largeText1: {
-    type: 'string',
-  },
-  largeText2: {
-    type: 'string',
-  },
-  discount: {
-    type: 'string',
-  },
-  saleTime: {
-    type: 'string',
-  }
-};
-
-
-// Call the function to create a new content type named 'banner'
-createContentType('banner', bannerAttributes);
-
-// Define the attributes for the `orderdetails` content type
-const orderDetailsAttributes = {
-  status: {
-    type: 'string',
-  },
-  cost: {
-    type: 'float',
-  },
-  phoneNumber: {
-    type: 'string',
-  },
-  name: {
-    type: 'string',
-    required: true,
-  },
-  addressType: {
-    type: 'enumeration',
-    enum: ['ARAB_48', 'West_Bank'],
-    required: true,
-  },
-  address: {
-    type: 'string',
-    required: true,
-  },
-  street: {
-    type: 'string',
-    required: true,
-  },
-  city: {
-    type: 'string',
-    required: true,
-  },
-  paymentMethod: {
-    type: 'enumeration',
-    enum: ['Credit Card', 'Cash on Delivery'],
-    required: true,
-  },
-  notes: {
+  description: {
     type: 'text',
   },
-  subtotal: {
-    type: 'float',
-    required: true,
+  slug: {
+    type: 'uid',
+    targetField: 'title',
   },
-  cart: {
-    type: 'json',
-  },
-};
-
-// Call the function to create a new content type named 'orderdetails'
-createContentType('orderdetails', orderDetailsAttributes);
-
-
-// Define the attributes for the `brand` content type
-const brandAttributes = {
-  image: {
+  cover: {
     type: 'media',
-    multiple: true,
-    required: true,
+    multiple: false,
     allowedTypes: ['images'],
   },
-  name: {
-    type: 'string',
-    required: true,
+  author: {
+    type: 'relation',
+    relation: 'manyToOne',
+    target: 'api::author.author',
   },
-  details: {
-    type: 'string',
-  }
+  categories: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::category.category',
+  },
+  blocks: {
+    type: 'dynamiczone',
+    components: ['media', 'quote', 'rich-text', 'slider'],
+  },
+  content: {
+    type: 'richtext',
+  },
+  conver: {
+    type: 'media',
+    multiple: false,
+    allowedTypes: ['images'],
+  },
+  vedioLinks: {
+    type: 'component',
+    repeatable: true,
+    component: 'links.video-link',
+  },
 };
 
-// Call the function to create a new content type named 'brand'
-createContentType('brand', brandAttributes);
+// Define attributes for Author
+const authorAttributes = {
+  name: {
+    type: 'string',
+  },
+  avatar: {
+    type: 'media',
+    multiple: false,
+    allowedTypes: ['images'],
+  },
+  email: {
+    type: 'string',
+  },
+  articles: {
+    type: 'relation',
+    relation: 'oneToMany',
+    target: 'api::article.article',
+  },
+};
 
+// Define attributes for Category
+const categoryAttributes = {
+  name: {
+    type: 'string',
+  },
+  slug: {
+    type: 'uid',
+    targetField: 'name',
+  },
+  description: {
+    type: 'text',
+  },
+  articles: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::article.article',
+  },
+};
 
+// Define attributes for Parts
+const partsAttributes = {
+  slug: {
+    type: 'uid',
+    targetField: 'title',
+  },
+  title: {
+    type: 'string',
+  },
+  description: {
+    type: 'text',
+  },
+  date: {
+    type: 'datetime',
+  },
+  images: {
+    type: 'media',
+    multiple: true,
+    allowedTypes: ['images'],
+  },
+  stores: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::store.store',
+  },
+  available: {
+    type: 'boolean',
+  },
+  details: {
+    type: 'json',
+  },
+  price: {
+    type: 'decimal',
+  },
+  categories: {
+    type: 'string',
+  },
+};
 
-// Define the attributes for the `product` content type to match the CSV order and table structure
+// Define attributes for Product
 const productAttributes = {
   image: {
     type: 'media',
-    multiple: true,
-    required: true,
+    multiple: false,
     allowedTypes: ['images'],
   },
   categories: {
-    type: 'string', // JSON type for array of strings
+    type: 'string',
   },
   quantity: {
     type: 'integer',
@@ -287,17 +227,129 @@ const productAttributes = {
     targetField: 'name',
   },
   price: {
-    type: 'float',
+    type: 'decimal',
   },
   details: {
-    type: 'text',
+    type: 'json',
   },
-  colors: {
-    type: 'json', // JSON type for color options
-  }
+  store: {
+    type: 'relation',
+    relation: 'manyToOne',
+    target: 'api::store.store',
+  },
+  services: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::services.services',
+  },
 };
 
-// Call the function to create a new content type named 'product'
+// Define attributes for Services
+const servicesAttributes = {
+  title: {
+    type: 'string',
+  },
+  description: {
+    type: 'text',
+  },
+  price: {
+    type: 'decimal',
+  },
+  stores: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::store.store',
+  },
+  image: {
+    type: 'media',
+    multiple: false,
+    allowedTypes: ['images'],
+  },
+  date: {
+    type: 'datetime',
+  },
+  details: {
+    type: 'json',
+  },
+  slug: {
+    type: 'uid',
+    targetField: 'title',
+  },
+  products: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::product.product',
+  },
+};
+
+// Define attributes for Store
+const storeAttributes = {
+  name: {
+    type: 'string',
+  },
+  phone: {
+    type: 'string',
+  },
+  address: {
+    type: 'string',
+  },
+  details: {
+    type: 'richtext',
+  },
+  hostname: {
+    type: 'string',
+  },
+  visits: {
+    type: 'integer',
+  },
+  orderdetails: {
+    type: 'relation',
+    relation: 'oneToMany',
+    target: 'api::orderdetails.orderdetails',
+  },
+  tags: {
+    type: 'string',
+  },
+  provider: {
+    type: 'string',
+  },
+  slug: {
+    type: 'uid',
+    targetField: 'name',
+  },
+  products: {
+    type: 'relation',
+    relation: 'oneToMany',
+    target: 'api::product.product',
+  },
+  logo: {
+    type: 'media',
+    multiple: false,
+    allowedTypes: ['images'],
+  },
+  socialMedia: {
+    type: 'json',
+  },
+  parts: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::parts.parts',
+  },
+  services: {
+    type: 'relation',
+    relation: 'manyToMany',
+    target: 'api::services.services',
+  },
+  apiToken: {
+    type: 'string',
+  },
+};
+
+// Create all content types
+createContentType('article', articleAttributes);
+createContentType('author', authorAttributes);
+createContentType('category', categoryAttributes);
+createContentType('parts', partsAttributes);
 createContentType('product', productAttributes);
-
-
+createContentType('services', servicesAttributes);
+createContentType('store', storeAttributes); 
